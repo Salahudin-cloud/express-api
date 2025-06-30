@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  database:
+    container_name: database-express
+    image: postgres:17-alpine3.20
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: express
+      POSTGRES_USER: asdf
+      POSTGRES_PASSWORD: asdf
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    shm_size: 1g
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U asdf"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # api:
+  #   build: .
+  #   container_name: express-api
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+
+volumes:
+  pg_data:
